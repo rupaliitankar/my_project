@@ -1,0 +1,54 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+from statsmodels.tsa.seasonal import seasonal_decompose
+
+
+unemployment_data = pd.read_csv('/content/Unemployment_Rate_upto_11_2020.csv')
+print(unemployment_data)
+print(unemployment_data.columns)
+
+# Convert 'Date' column to datetime format
+unemployment_data['Date'] = pd.to_datetime(unemployment_data['Date'])
+
+# Set 'Date' column as index
+unemployment_data.set_index('Date', inplace=True)
+
+# Plot the unemployment rate over time
+plt.figure(figsize=(10, 6))
+plt.plot(unemployment_data.index, unemployment_data[' Estimated Unemployment Rate (%)'], marker='o', linestyle='-')
+plt.title('Unemployment Rate Over Time')
+plt.xlabel('Date')
+plt.ylabel('Unemployment Rate (%)')
+plt.grid(True)
+plt.show()
+
+# Time Series Decomposition
+decomposition = seasonal_decompose(unemployment_data[' Estimated Unemployment Rate (%)'], model='additive', period=1)
+trend = decomposition.trend
+seasonal = decomposition.seasonal
+residual = decomposition.resid
+
+# Plot the decomposed components
+plt.figure(figsize=(10, 8))
+plt.subplot(411)
+plt.plot(unemployment_data.index, unemployment_data[' Estimated Unemployment Rate (%)'], label='Original', marker='o', color='g')
+plt.legend(loc='best')
+plt.title('Original Unemployment Rate')
+
+plt.subplot(412)
+plt.plot(unemployment_data.index, trend, label='Trend', marker='o', color='r')
+plt.legend(loc='best')
+plt.title('Trend')
+
+plt.subplot(413)
+plt.plot(unemployment_data.index, seasonal, label='Seasonal', marker='o', color='m')
+plt.legend(loc='best')
+plt.title('Seasonal')
+
+plt.subplot(414)
+plt.plot(unemployment_data.index, residual, label='Residual', marker='o', color='y')
+plt.legend(loc='best')
+plt.title('Residual')
+
+plt.tight_layout()
+plt.show()
